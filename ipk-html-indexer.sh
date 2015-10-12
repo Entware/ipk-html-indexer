@@ -13,16 +13,25 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/ht
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 <title>Packages list</title>
 </head>
-<body>'
+<script src="/js/list.js"></script>
+<link rel="stylesheet" href="/css/packages.css">
+<body>
+<div id="packages">
+You may sort table by clicking any column headers and\or use <input class="search" placeholder="Search" /> field.
+'
 
 # Table header
 echo '<table border="1">
+<thead>
 <tr>
-<th>Name</th>
-<th>Version</th>
-<th>Section</th>
-<th>Description</th>
-</tr>'
+<th class="sort" data-sort="name">Name</th>
+<th class="sort" data-sort="version">Version</th>
+<th class="sort" data-sort="section">Section</th>
+<th class="sort">Description</th>
+</tr>
+</thead>
+<tbody class="list">
+'
 
 # Table strings
 while read line; do
@@ -50,15 +59,26 @@ while read line; do
 
     if [ -z "$line" ] && [ "$pkg_info_started" -eq "1" ]
     then
-	echo "<tr><td><a href=\"$filename\">$name</a></td>
-<td>$version</td>
-<td>$section</td>
-<td>$description</td></tr>"
-	pkg_info_started=0
+        echo "<tr><td class=\"name\"><a href=\"$filename\">$name</a></td>
+<td class=\"version\">$version</td>
+<td class=\"section\">$section</td>
+<td class=\"description\">$description</td></tr>"
+        pkg_info_started=0
     fi
 done < Packages
 
 # Closing HTML table and body
-echo '</table>'
-echo '</body>
-</html>'
+cat << EOF
+</tbody>
+</table>
+</div>
+<script type="text/javascript" type="text/javascript">
+    var options = {
+        valueNames: [ 'name', 'version', 'section', 'description' ]
+    };
+
+    var userList = new List('packages', options);
+</script>
+</body>
+</html>
+EOF
