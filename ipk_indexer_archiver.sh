@@ -4,7 +4,7 @@
 #
 
 # Some measurements on this VPS:
-# indexing 9000 packages takes ~6 minutes (~25 packages per second),
+# indexing 9000 packages takes ~1,1 minutes,
 # archiving ~0,5 minutes.
 
 if [ -z "$1" ] ; then
@@ -12,7 +12,7 @@ if [ -z "$1" ] ; then
 	Usage:
 	ipk_index_archiver.sh /path/to/repo arch_html
 	/path/to/repo	- folder with *.ipk files
-	arch_html 	- build HTML index and make an archive of packages
+	arch_html 	- (optional) build HTML index and make an archive of packages
 EOF
     exit 0
 fi

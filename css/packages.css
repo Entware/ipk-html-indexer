@@ -1,3 +1,10 @@
+td {
+  padding:0px 0px; 
+  border:solid 1px #eee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 input {
   border:solid 1px #ccc;
   border-radius: 5px;
@@ -43,7 +50,7 @@ input:focus {
   border-top: 5px solid #fff;
   content:"";
   position: relative;
-  top:13px;
+  top:4px;
   right:-5px;
 }
 .sort.desc:after {
@@ -54,6 +61,24 @@ input:focus {
   border-bottom: 5px solid #fff;
   content:"";
   position: relative;
-  top:-10px;
+  top:-4px;
   right:-5px;
 }
+tr:nth-child(even) {
+  background-color: #eee;
+}
+tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.name {
+}
+.version {
+  max-width: 100px;
+}
+.section {
+}
+.description {
+  max-width: 1000px;
+}
+

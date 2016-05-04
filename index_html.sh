@@ -12,16 +12,16 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/ht
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 <title>Packages list</title>
+<link rel="stylesheet" type="text/css" href="/css/packages.css">
 </head>
-<script src="/js/list.js"></script>
-<link rel="stylesheet" href="/css/packages.css">
+<script type="text/javascript" src="/js/list.js"></script>
 <body>
 <div id="packages">
 You may sort table by clicking any column headers and\or use <input class="search" placeholder="Search" /> field.
 '
 
 # Table header
-echo '<table border="1">
+echo '<table>
 <thead>
 <tr>
 <th class="sort" data-sort="name">Name</th>
@@ -72,7 +72,7 @@ cat << EOF
 </tbody>
 </table>
 </div>
-<script type="text/javascript" type="text/javascript">
+<script type="text/javascript">
     var options = {
         valueNames: [ 'name', 'version', 'section', 'description' ]
     };
