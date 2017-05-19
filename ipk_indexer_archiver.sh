@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2011-2015 Entware
+# Copyright (C) 2011-2016 Entware
 #
-
-# Some measurements on this VPS:
-# indexing 9000 packages takes ~1,1 minutes,
-# archiving ~0,5 minutes.
 
 if [ -z "$1" ] ; then
     cat << EOF
@@ -22,7 +18,7 @@ cd "$1"
 # Skip feed if no packages here
 if [ -z "$(ls *.ipk)" ] ; then
 	echo 'No *.ipk files found'
-	rm -f Packages Packages.gz
+	rm -f Packages Packages.gz Packages.html
 	exit 1
 fi
 
@@ -41,9 +37,9 @@ if [ ! -f Packages.gz ] || [ -n "$(find -maxdepth 1 -type f -name "*.ipk" -newer
     /usr/local/bin/ipkg-make-index.sh . > Packages.tmp
     # This is a trick for instant replacing feed index
     # Otherwise, index will be absent for several minutes
-    mv -f Packages.tmp Packages
-
-    gzip -9c Packages > Packages.gz
+    grep -vE '^(Maintainer|LicenseFiles|Source|Require)' Packages.tmp > Packages
+    rm -f Packages.tmp
+    gzip -9nc Packages > Packages.gz
 
     if [ ! -z "$2" ] ; then
 	/usr/local/bin/index_html.sh > Packages.html
