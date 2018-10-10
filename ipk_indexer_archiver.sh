@@ -34,11 +34,8 @@ if [ ! -f Packages.gz ] || [ -n "$(find -maxdepth 1 -type f -name "*.ipk" -newer
     fi
 
     echo "Indexing $1 ..."
-    /usr/local/bin/ipkg-make-index.sh . > Packages.tmp
-    # This is a trick for instant replacing feed index
-    # Otherwise, index will be absent for several minutes
-    grep -vE '^(Maintainer|LicenseFiles|Source|Require)' Packages.tmp > Packages
-    rm -f Packages.tmp
+    /usr/local/bin/ipkg-make-index.sh . 2>&1 > Packages.manifest
+    grep -vE '^(Maintainer|LicenseFiles|Source|Require)' Packages.manifest > Packages
     gzip -9nc Packages > Packages.gz
 
     if [ ! -z "$2" ] ; then
