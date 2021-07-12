@@ -47,9 +47,7 @@ def patch(package):
 
 out = ""
 out2 = ""
-for i in os.walk(path):
-	_, _, _files = i
-	break
+_files = next(os.walk(path))[-1]
 files = []
 for i in _files:
 	if i.endswith(".ipk"):
