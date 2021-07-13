@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2011-2020 Entware
+# Copyright (C) 2011-2021 Entware
 
-import os, sys
+import os
 import hashlib
 import tarfile
-import time
 import gzip
 import sys
-import random
+import io
+import time
+
+start = time.time()
 
 path = sys.argv[-1] + "/"
+
 if not os.path.isdir(path):
     print(path + " folder is not exists!")
     sys.exit()
-
-rand_num = str(random.getrandbits(64))
-tmp = f"/tmp/s{rand_num}/"
-os.mkdir(tmp)
 
 def size(path):
 	return os.path.getsize(path)
@@ -28,12 +27,10 @@ def patch(package):
 	_fields = []
 	fields = ['Package: ', 'Version: ', 'Depends: ', 'Conflicts: ', 'Provides: ', 'Section: ', 'Essential: ', 'Architecture: ', 'Installed-Size: ', 'Filename: ', 'Size: ', 'SHA256sum: ']
 	for j in fields:
-		ok = False
 		for i in _package:
 			if i.startswith(j):
 				out.append(i.split(j)[1])
 				_fields.append(j)
-				ok = True
 	_fields.append("Description: ")
 	a = package.find("Description: ")
 	if a >= 0:
@@ -45,53 +42,32 @@ def patch(package):
 		s += 1
 	return _out
 
-out = ""
-out2 = ""
-for i in os.walk(path):
-	_, _, _files = i
-	break
-files = []
-for i in _files:
-	if i.endswith(".ipk"):
-		files.append(i)
 def get_hash(file):
 	sha256 = hashlib.sha256()
 	with open(file, "rb") as f:
 	    sha256.update(f.read())
 	return sha256.hexdigest()
+
+a_ = open(path + "Packages.manifest", "w")
+a2_ = open(path + "Packages", "w")
+files = [i for i in next(os.walk(path))[-1] if i.endswith(".ipk")]
 files.sort(key = lambda x: x.split("_")[0])
+
 for i in files:
-    tar = tarfile.open(path + i, "r:gz")
-    cur = tar.next()
-    while cur.name != "./control.tar.gz":
-    	cur = tar.next()
-    tar.extract(cur, path = tmp)
-    tar.close()
-    tar = tarfile.open(tmp + "control.tar.gz", "r:gz")
-    cur = tar.next()
-    while cur.name != "./control":
-    	cur = tar.next()
-    tar.extract(cur, path = tmp)
-    tar.close()
-    a = open(tmp + "control")
-    b = a.read()
-    a.close()
-    os.remove(tmp + "control")
-    os.remove(tmp + "control.tar.gz")
+    with tarfile.open(path + i, "r:gz") as tar:
+        control_file = tar.extractfile("./control.tar.gz").read()
+        with tarfile.open(fileobj = io.BytesIO(control_file), mode = "r:gz") as tar2:
+            b = tar2.extractfile("./control").read().decode()
     c = b.find("Description: ")
     d = b[:c] + "Filename: " + i + "\nSize: " + str(size(path+i)) + "\nSHA256sum: " + str(get_hash(path + i)) + "\n" + b[c:].replace("Description:  ", "Description: ")
-    out += d + "\n"
-    out2 += patch(d)
+    a_.write(d + "\n")
+    a2_.write(patch(d))
 
-os.rmdir(tmp)
+a_.close()
+a2_.close()
 
-a = open(path + "Packages.manifest", "w")
-a.write(out)
-a.close()
+with gzip.open(path + 'Packages.gz', 'wb') as f, open(path + 'Packages', 'rb') as p:
+    f.write(p.read())
 
-a = open(path + "Packages", "w")
-a.write(out2)
-a.close()
-
-with gzip.open(path + 'Packages.gz', 'wb') as f:
-    f.write(out2.encode())
+finish = time.time()
+print(f'Indexing finished, spent {round(finish-start, 2)} sec.')
